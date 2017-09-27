@@ -1,4 +1,6 @@
 document.addEventListener("DOMContentLoaded", function() {
+  console.log("Hello Test!");
+
   var url = $("input[name=tmp_form_host]").val();
   console.log("url", url);
 
