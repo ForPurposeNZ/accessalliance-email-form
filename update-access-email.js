@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function() {
   var url = $("input[name=tmp_form_host]").val();
   console.log("url", url);
 
-  $(ELECTORATE_DROPDOWN_ID).on("changed", dropdownChanged);
+  $(ELECTORATE_DROPDOWN_ID).change(dropdownChanged);
   //replaceLetterContent();
 
   // set initial electorate from parameter
