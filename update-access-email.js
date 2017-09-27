@@ -38,30 +38,43 @@ function replaceParameterContent() {
   console.log("total", total);
   if (total)
     insertContent += "Total people with access sensitivity: " + total + "\n";
+
+  return insertContent;
 }
 
-function replaceLetterContent() {
-  var emailBody = $("#id123-control32357387");
-  var prevEmailBody = emailBody.val();
-  console.log("prevEmailBody", prevEmailBody);
-
-  var updatedEmailBody = prevEmailBody.replace("@@@@", insertContent);
-  console.log("updatedEmailBody", updatedEmailBody);
-  emailBody.val(updatedEmailBody);
+function getRelevantEmailContent(fullEmailBody, electorate) {
+  var emailParts = fullEmailBody.split(HEADER_MARKER_SPLITTER);
+  for (var i = 0; i < emailParts.length - 1; i += 2) {
+    var header = emailParts[i].trim() + ",";
+    if (header.indexOf(electorate + ",") !== -1) {
+      return emailParts(i + 1);
+    }
+  }
 }
 
-function dropdownChanged() {
-  Console.log("Changed!");
+function replaceEmailContent() {
+  var electorate = $(ELECTORATE_DROPDOWN_ID).val();
+  console.log("selected electorate", electorate);
+  if (electorate == undefined) return "Please select your electorate.";
+
+  var fullEmailBody = $(EMAIL_ELEMENT_ID).val();
+  console.log("prevEmailBody", fullEmailBody);
+
+  var emailBody = getRelevantEmailContent(fullEmailBody, electorate);
+
+  var parameterContent = replaceParameterContent();
+  emailBody = emailBody.replace("@@@@", parameterContent);
+
+  console.log("updatedEmailBody", emailBody);
+  emailBody.val(emailBody);
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-  console.log("Hello Test!");
-
   var url = $("input[name=tmp_form_host]").val();
   console.log("url", url);
 
-  $(ELECTORATE_DROPDOWN_ID).change(dropdownChanged);
-  //replaceLetterContent();
+  // update the letter content when electorate changes
+  $(ELECTORATE_DROPDOWN_ID).change(replaceLetterContent);
 
   // set initial electorate from parameter
   var electorate = getParameterByName("electorate", url);
