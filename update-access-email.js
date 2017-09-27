@@ -1,3 +1,4 @@
+var ORIGINAL_EMAIL_CONTENT = ""; // this is set on page load
 var ELECTORATE_DROPDOWN_ID = "#id123-control31500616";
 var EMAIL_ELEMENT_ID = "#id123-control31500105";
 var HEADER_MARKER_SPLITTER = "###";
@@ -15,6 +16,9 @@ function getParameterByName(name, url) {
 
 function replaceParameterContent() {
   var insertContent = "\n";
+
+  var url = $("input[name=tmp_form_host]").val();
+  console.log("url", url);
 
   var kids = getParameterByName("kids", url);
   console.log("kids", kids);
@@ -42,11 +46,13 @@ function replaceParameterContent() {
   return insertContent;
 }
 
-function getRelevantEmailContent(fullEmailBody, electorate) {
-  var emailParts = fullEmailBody.split(HEADER_MARKER_SPLITTER);
+function getRelevantEmailContent(electorate) {
+  var emailParts = ORIGINAL_EMAIL_CONTENT.split(HEADER_MARKER_SPLITTER);
   for (var i = 0; i < emailParts.length - 1; i += 2) {
     var header = emailParts[i].trim() + ",";
+    console.log("header", header);
     if (header.indexOf(electorate + ",") !== -1) {
+      console.log("email found", emailParts(i + 1));
       return emailParts(i + 1);
     }
   }
@@ -54,27 +60,28 @@ function getRelevantEmailContent(fullEmailBody, electorate) {
 
 function replaceEmailContent() {
   var electorate = $(ELECTORATE_DROPDOWN_ID).val();
-  console.log("selected electorate", electorate);
-  if (electorate == undefined) return "Please select your electorate.";
+  console.log("electorate: ", electorate);
+  if (electorate == undefined) {
+    $(EMAIL_ELEMENT_ID).val("Please select your electorate.");
+    return;
+  }
 
-  var fullEmailBody = $(EMAIL_ELEMENT_ID).val();
-  console.log("prevEmailBody", fullEmailBody);
-
-  var emailBody = getRelevantEmailContent(fullEmailBody, electorate);
+  var emailBody = getRelevantEmailContent(electorate);
 
   var parameterContent = replaceParameterContent();
   emailBody = emailBody.replace("@@@@", parameterContent);
 
-  console.log("updatedEmailBody", emailBody);
-  emailBody.val(emailBody);
+  console.log("updatedEmailBody: ", emailBody);
+  $(EMAIL_ELEMENT_ID).val(emailBody);
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-  var url = $("input[name=tmp_form_host]").val();
-  console.log("url", url);
+  // store the original email content
+  ORIGINAL_EMAIL_CONTENT = $(EMAIL_ELEMENT_ID).val();
+  console.log("ORIGINAL_EMAIL_CONTENT: ", ORIGINAL_EMAIL_CONTENT);
 
   // update the letter content when electorate changes
-  $(ELECTORATE_DROPDOWN_ID).change(replaceLetterContent);
+  $(ELECTORATE_DROPDOWN_ID).change(replaceEmailContent);
 
   // set initial electorate from parameter
   var electorate = getParameterByName("electorate", url);
