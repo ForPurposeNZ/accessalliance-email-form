@@ -48,18 +48,16 @@ function replaceParameterContent() {
 }
 
 function getRelevantEmailContent(electorate) {
-  console.log(ORIGINAL_EMAIL_CONTENT);
-  console.log("-----");
   var emailParts = ORIGINAL_EMAIL_CONTENT.split(EMAIL_SPLITTER);
   for (var i = 0; i < emailParts.length; i++) {
-    var lines = emailParts[i].split(/\r?\n/);
+    var emailPart = emailParts[i].trim(/\r?\n/);
+    var lines = emailPart.split(/\r?\n/);
     var header = lines.shift();
-    console.log("header: ", header);
     if (header.startsWith("ELECTORATE:")) {
       header = header.trim() + ",";
       key = electorate + ",";
       if (header.indexOf(key) !== -1) {
-        console.log("email found", emailParts(i));
+        console.log("email found", emailPart);
         var result = lines.join("\n");
         return result;
       }
