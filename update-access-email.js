@@ -1,7 +1,8 @@
-var ORIGINAL_EMAIL_CONTENT = ""; // this is set on page load
 var ELECTORATE_DROPDOWN_ID = "#id123-control31500616";
 var EMAIL_ELEMENT_ID = "#id123-control31500105";
-var HEADER_MARKER_SPLITTER = "###";
+var EMAIL_SPLITTER = "---";
+
+var ORIGINAL_EMAIL_CONTENT = ""; // this is set on page load
 
 function getParameterByName(name, url) {
   console.log("made it to getParameterByName");
@@ -47,6 +48,27 @@ function replaceParameterContent() {
 }
 
 function getRelevantEmailContent(electorate) {
+  console.log(ORIGINAL_EMAIL_CONTENT);
+  console.log("-----");
+  var emailParts = ORIGINAL_EMAIL_CONTENT.split(EMAIL_SPLITTER);
+  for (var i = 0; i < emailParts.length; i++) {
+    var lines = emailParts[i].split(/\r?\n/);
+    var header = lines.shift();
+    console.log("header: ", header);
+    if (header.startsWith("ELECTORATE:")) {
+      header = header.trim() + ",";
+      key = electorate + ",";
+      if (header.indexOf(key) !== -1) {
+        console.log("email found", emailParts(i));
+        var result = lines.join("\n");
+        return result;
+      }
+    }
+  }
+  return "Unknown Electorate";
+}
+
+function getRelevantEmailContent(electorate) {
   var emailParts = ORIGINAL_EMAIL_CONTENT.split(HEADER_MARKER_SPLITTER);
   for (var i = 0; i < emailParts.length - 1; i += 2) {
     var header = emailParts[i].trim() + ",";
@@ -56,6 +78,7 @@ function getRelevantEmailContent(electorate) {
       return emailParts(i + 1);
     }
   }
+  return "Unknown Electorate";
 }
 
 function replaceEmailContent() {
@@ -84,6 +107,7 @@ document.addEventListener("DOMContentLoaded", function() {
   $(ELECTORATE_DROPDOWN_ID).change(replaceEmailContent);
 
   // set initial electorate from parameter
+  var url = $("input[name=tmp_form_host]").val();
   var electorate = getParameterByName("electorate", url);
   console.log("electorate", electorate);
   $(ELECTORATE_DROPDOWN_ID)
