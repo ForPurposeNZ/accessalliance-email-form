@@ -68,19 +68,6 @@ function getRelevantEmailContent(electorate) {
   return "Unknown Electorate";
 }
 
-function getRelevantEmailContent(electorate) {
-  var emailParts = ORIGINAL_EMAIL_CONTENT.split(HEADER_MARKER_SPLITTER);
-  for (var i = 0; i < emailParts.length - 1; i += 2) {
-    var header = emailParts[i].trim() + ",";
-    console.log("header", header);
-    if (header.indexOf(electorate + ",") !== -1) {
-      console.log("email found", emailParts(i + 1));
-      return emailParts(i + 1);
-    }
-  }
-  return "Unknown Electorate";
-}
-
 function replaceEmailContent() {
   var electorate = $(ELECTORATE_DROPDOWN_ID).val();
   console.log("electorate: ", electorate);
